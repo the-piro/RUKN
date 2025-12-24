@@ -36,8 +36,8 @@ class Config:
     BUZZHEAVIER_API = ""
     GDRIVE_ID = ""
     GD_DESP = "Uploaded with WZ Bot"
-    AUTHOR_NAME = "WZML-X"
-    AUTHOR_URL = "https://t.me/WZML_X"
+    AUTHOR_NAME = "Zero Botz"
+    AUTHOR_URL = "https://t.me/EchoBotz"
     INSTADL_API = ""
     IMDB_TEMPLATE = ""
     INCOMPLETE_TASK_NOTIFIER = False
@@ -95,6 +95,7 @@ class Config:
     SEARCH_PLUGINS = []
     SET_COMMANDS = True
     STATUS_LIMIT = 10
+    HIDE_NAME_SEC = 10
     STATUS_UPDATE_INTERVAL = 15
     STOP_DUPLICATE = False
     STREAMWISH_API = ""
