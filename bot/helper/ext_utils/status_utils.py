@@ -17,11 +17,11 @@ from ...core.config_manager import Config
 from ..telegram_helper.button_build import ButtonMaker
 
 SIZE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"]
-
+HIDE_NAME_SEC = 10
 
 class MirrorStatus:
-    STATUS_UPLOAD = "Upload"
-    STATUS_DOWNLOAD = "Download"
+    STATUS_UPLOAD = "🥂 Upload"
+    STATUS_DOWNLOAD = "🥀 Download"
     STATUS_CLONE = "Clone"
     STATUS_QUEUEDL = "QueueDl"
     STATUS_QUEUEUP = "QueueUp"
@@ -196,8 +196,8 @@ def get_progress_bar_string(pct):
     pct = float(str(pct).strip("%"))
     p = min(max(pct, 0), 100)
     cFull = int(p // 8)
-    p_str = "⬢" * cFull
-    p_str += "⬡" * (12 - cFull)
+    p_str = "⬤" * cFull
+    p_str += "□" * (12 - cFull)
     return f"[{p_str}]"
 
 
