@@ -109,14 +109,15 @@ class TelegramUploader:
             self._thumb = None
 
     async def _msg_to_reply(self):
-        if self._listener.up_dest:
-            msg_link = (
-                self._listener.message.link if self._listener.is_super_chat else ""
-            )
-            msg = f"""➲ <b><u>Leech Started :</u></b>
+        msg_link = (
+            self._listener.message.link if self._listener.is_super_chat else ""
+        )
+        msg = f"""➲ <b><u>Leech Started :</u></b>
 ┃
 ┠ <b>User :</b> {self._listener.user.mention} ( #ID{self._listener.user_id} ){f"\n┠ <b>Message Link :</b> <a href='{msg_link}'>Click Here</a>" if msg_link else ""}
 ┖ <b>Source :</b> <a href='{self._listener.source_url}'>Click Here</a>"""
+        
+        if self._listener.up_dest:
             try:
                 self._log_msg = await TgClient.bot.send_message(
                     chat_id=self._listener.up_dest,
@@ -151,24 +152,28 @@ class TelegramUploader:
                                 self._listener.user_id,
                                 f"Failed to send 'Leech Started' message to {self._listener.leech_dest}\n{e}",
                             )
+                return True
             except Exception as e:
-                await self._listener.on_upload_error(str(e))
-                return False
-
-        elif self._user_session:
-            self._sent_msg = await TgClient.user.get_messages(
-                chat_id=self._listener.message.chat.id, message_ids=self._listener.mid
+                LOGGER.error(f"Failed to send to up_dest: {e}")
+        
+        try:
+            self._sent_msg = await TgClient.bot.send_message(
+                chat_id=self._listener.user_id,
+                text=msg,
+                disable_web_page_preview=True,
+                disable_notification=True,
+                reply_to_message_id=(
+                    self._listener.pm_msg.id if self._listener.pm_msg else None
+                ),
             )
-            if self._sent_msg is None:
-                self._sent_msg = await TgClient.user.send_message(
-                    chat_id=self._listener.message.chat.id,
-                    text="Deleted Cmd Message! Don't delete the cmd message again!",
-                    disable_web_page_preview=True,
-                    disable_notification=True,
-                )
-        else:
-            self._sent_msg = self._listener.message
-        return True
+            self._bot_pm = False
+            self._is_private = True
+            return True
+        except Exception as e:
+            await self._listener.on_upload_error(
+                f"Cannot upload: Bot PM unavailable and no upload destination configured. Error: {e}"
+            )
+            return False
 
     async def _prepare_file(self, pre_file_, dirpath):
         cap_file_ = file_ = pre_file_
@@ -320,18 +325,31 @@ class TelegramUploader:
 
     async def _copy_media(self):
         try:
-            if self._bot_pm:
-                await TgClient.bot.copy_message(
-                    chat_id=self._listener.user_id,
-                    from_chat_id=self._sent_msg.chat.id,
-                    message_id=self._sent_msg.id,
-                    reply_to_message_id=(
-                        self._listener.pm_msg.id if self._listener.pm_msg else None
-                    ),
-                )
+            if self._listener.leech_dest:
+                try:
+                    leech_dest = self._listener.leech_dest
+                    if not isinstance(leech_dest, int):
+                        if "|" in str(leech_dest):
+                            leech_dest, _ = str(leech_dest).split("|", 1)
+                        if leech_dest.lstrip("-").isdigit():
+                            leech_dest = int(leech_dest)
+                    await TgClient.bot.copy_message(
+                        chat_id=leech_dest,
+                        from_chat_id=self._sent_msg.chat.id,
+                        message_id=self._sent_msg.id,
+                    )
+                except Exception as e:
+                    if not self._listener.is_cancelled:
+                        LOGGER.error(
+                            f"Failed to forward to {self._listener.leech_dest}: {e}"
+                        )
+                        await send_message(
+                            self._listener.user_id,
+                            f"Failed to forward to {self._listener.leech_dest}\n{e}",
+                        )
         except Exception as err:
             if not self._listener.is_cancelled:
-                LOGGER.error(f"Failed To Send in BotPM:\n{str(err)}")
+                LOGGER.error(f"Failed to copy media:\n{str(err)}")
 
     async def upload(self):
         await self._user_settings()
@@ -593,28 +611,6 @@ class TelegramUploader:
 
             if self._sent_msg:
                 await self._copy_media()
-                if self._listener.leech_dest:
-                    try:
-                        leech_dest = self._listener.leech_dest
-                        if not isinstance(leech_dest, int):
-                            if "|" in str(leech_dest):
-                                leech_dest, _ = str(leech_dest).split("|", 1)
-                            if leech_dest.lstrip("-").isdigit():
-                                leech_dest = int(leech_dest)
-                        await TgClient.bot.copy_message(
-                            chat_id=leech_dest,
-                            from_chat_id=self._sent_msg.chat.id,
-                            message_id=self._sent_msg.id,
-                        )
-                    except Exception as e:
-                        if not self._listener.is_cancelled:
-                            LOGGER.error(
-                                f"Failed to forward to {self._listener.leech_dest}: {e}"
-                            )
-                            await send_message(
-                                self._listener.user_id,
-                                f"Failed to forward to {self._listener.leech_dest}\n{e}",
-                            )
 
             if (
                 self._thumb is None
