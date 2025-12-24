@@ -404,11 +404,12 @@ class TaskListener(TaskConfig):
         ):
             await database.rm_complete_task(self.message.link)
         msg = (
-            f"<b><i>{escape(self.name)}</i></b>\n│"
+            #f"<b><i>{escape(self.name)}</i></b>\n│"
             f"\n┟ <b>Task Size</b> → {get_readable_file_size(self.size)}"
             f"\n┠ <b>Time Taken</b> → {get_readable_time(time() - self.message.date.timestamp())}"
             f"\n┠ <b>In Mode</b> → {self.mode[0]}"
             f"\n┠ <b>Out Mode</b> → {self.mode[1]}"
+            f"<b><i>Join @ZeroBotz</i></b>\n│"
         )
         LOGGER.info(f"Task Done: {self.name}")
         if self.is_yt:
