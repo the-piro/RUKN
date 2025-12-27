@@ -520,7 +520,7 @@ class TelegramUploader:
                     quote=True,
                     thumb=thumb,
                     caption=cap_mono,
-                    disable_content_type_detection=True,
+                    #disable_content_type_detection=True,
                     disable_notification=True,
                     progress=self._upload_progress,
                 )
