@@ -1,0 +1,75 @@
+Hello Jules,
+
+I need you to implement a user settings system in my other bot. The goal is to allow users to customize various aspects of the bot's behavior through a settings menu.
+
+Please implement the user settings system as described in the following detailed explanation. This explanation is based on the user settings system in the other repository and should serve as the technical specification for this task.
+
+---
+
+### User Settings System: A Detailed Explanation
+
+This document provides a comprehensive explanation of the user settings system. The system should allow users to view and edit their settings through a series of interactive menus in a private message with the bot.
+
+#### 1. Core Functionality:
+
+*   **/usersettings Command:** The entry point to the user settings menu should be a new command, `/usersettings`.
+*   **Interactive Menus:** The settings should be organized into logical categories (e.g., "Leech Settings", "RClone Settings", "GDrive Settings"). Each category should have its own menu with buttons to view and edit the settings.
+*   **User-Specific Settings:** All settings must be stored on a per-user basis, identified by their user ID.
+*   **Database Integration:** User settings should be persisted in a database. Use a database handler to save and retrieve user data.
+*   **Dynamic Buttons:** The buttons in the settings menus should be dynamic. For example, a button to "Set" a value should change to "Change" and a "Remove" button should appear after a value has been set.
+
+#### 2. Settings to Implement:
+
+Please implement the following user settings, organized into the specified categories. Each setting should have a clear description and a user-friendly way to set or change its value.
+
+**A. Leech Settings:**
+
+*   **Custom Thumbnail:** Allow users to upload a photo to be used as a custom thumbnail for leeched files.
+*   **Leech Split Size:** Allow users to set a custom split size for leeched files.
+*   **Leech Destination:** Allow users to specify a chat ID where leeched files should be sent.
+*   **Leech Prefix:** Allow users to add a custom prefix to the filenames of leeched files.
+*   **Leech Suffix:** Allow users to add a custom suffix to the filenames of leeched files.
+*   **Leech Caption:** Allow users to set a custom caption for leeched files.
+*   **Send as Document/Media:** A toggle to let users choose whether to send leeched files as documents or media.
+
+**B. RClone Settings:**
+
+*   **RClone Config:** Allow users to upload their `rclone.conf` file.
+*   **Default RClone Path:** Allow users to set a default upload path for RClone.
+
+**C. GDrive Settings:**
+
+*   **token.pickle:** Allow users to upload their `token.pickle` file for Google Drive authentication.
+*   **Default GDrive ID:** Allow users to set a default Google Drive folder ID for uploads.
+*   **Index URL:** Allow users to set an index URL for their Google Drive files.
+
+**D. Advanced Settings:**
+
+*   **Excluded Extensions:** Allow users to specify a list of file extensions to exclude from downloads.
+*   **YT-DLP Options:** Allow users to set custom options for `yt-dlp` downloads.
+
+#### 3. Implementation Guidance:
+
+*   **`users_settings.py` Module:** Create a new module, `bot/modules/users_settings.py`, to house the logic for the user settings system. This module should contain:
+    *   The main function to handle the `/usersettings` command.
+    *   Functions to generate the settings menus with their dynamic buttons.
+    *   Functions to handle the button callbacks and update the user's settings in the database.
+*   **Event Handler:** Implement an event handler to wait for user input when they are prompted to set a value (e.g., send a photo for the thumbnail, or text for the leech prefix). This handler should have a timeout to prevent it from waiting indefinitely.
+*   **Database Handler:** Ensure that your database handler has functions to update and retrieve user data. The settings should be stored in a dictionary under the user's ID.
+*   **Handlers:** Add the necessary handlers for the `/usersettings` command and the button callbacks in the appropriate file (e.g., `bot/core/handlers.py`).
+
+#### 4. Example Workflow:
+
+1.  A user sends the `/usersettings` command to the bot.
+2.  The bot responds with the main settings menu, showing the different categories.
+3.  The user clicks the "Leech Settings" button.
+4.  The bot displays the leech settings menu, with buttons for each option.
+5.  The user clicks the "Custom Thumbnail" button.
+6.  The bot prompts the user to send a photo.
+7.  The user sends a photo.
+8.  The bot saves the photo as the user's custom thumbnail and updates the database.
+9.  The bot returns the user to the leech settings menu, where the "Custom Thumbnail" option now shows that a thumbnail is set.
+
+---
+
+Please follow these instructions to implement the user settings system. Let me know if you have any questions.
