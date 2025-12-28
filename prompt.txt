@@ -1,38 +1,34 @@
 Hello Jules,
 
-I need you to implement a task queue system in my "En" repository on the "dl" branch. This repository contains a mega downloader bot, and the goal is to manage concurrent downloads and uploads to prevent overloading the server.
+I need you to implement a task queue system in my bot.
 
 Please implement the queue system as described in the following detailed explanation. This explanation, which you created, should serve as the technical specification for this task.
 
----
+This document provides a comprehensive explanation of the bot's queue system, using a `/leech` command as a practical example. The explanation will cover the system's configuration, how tasks are added to the download and upload queues, how the bot processes the queue.
 
-### The Bot's Queue System: A Detailed Explanation
-
-This document provides a comprehensive explanation of the bot's queue system, using a `/leech` command as a practical example. The explanation will cover the system's configuration, how tasks are added to the download and upload queues, how the bot processes the queues, and how users can bypass the queue.
-
-#### 1. Configuration: The Foundation of the Queue
+1. Configuration: The Foundation of the Queue
 
 The queue system's behavior is primarily controlled by three configuration variables found in `config.py`:
 
-*   `QUEUE_ALL`: This sets the maximum number of tasks that can be active (both downloading and uploading) at any given time.
+*   `QUEUE_ALL`: This sets the maximum number of tasks that can be active (both downloading and uploading) at a time.
 *   `QUEUE_DOWNLOAD`: This sets the maximum number of concurrent downloads.
 *   `QUEUE_UPLOAD`: This sets the maximum number of concurrent uploads.
 
-As we discovered in our analysis of `config_sample.py`, the default value for all these variables is `0`, which means the queue system is **disabled** by default. To enable it, a user must set these variables to a positive integer in their `config.py` file.
+The default value for all these variables is `0`, which means the queue system is **disabled** by default. To enable it, a admin must set these variables or edit bot settings from bot to a positive integer in their values.
 
-#### 2. The Leech Command: A Practical Example
+2. The Leech Command: A Practical Example
 
 Let's walk through what happens when a user issues a `/leech` command.
 
-**File:** `bot/modules/mirror_leech.py`
+File: `echobotz/plugins/leech.py`
 
 When a user sends a `/leech` command, the `leech` function in this file is triggered. This function creates a `Mirror` object with `is_leech=True` and calls the `new_event` method. This method is the entry point for handling the leech task.
 
-#### 3. Pre-Task Checks: To Queue or Not to Queue?
+3. Pre-Task Checks: To Queue or Not to Queue?
 
-**File:** `bot/helper/ext_utils/task_manager.py`
+File: `echobotz/helper/ext_utils/task_manager.py`
 
-Before the download even begins, the `new_event` method in `mirror_leech.py` calls the `pre_task_check` function from `task_manager.py`. This function performs several checks, including:
+Before the download even begins, the `new_event` method in `leech.py` calls the `pre_task_check` function from `task_manager.py`. This function performs several checks, including:
 
 *   **User authorization:** It verifies if the user is authorized to use the bot.
 *   **Task limits:** It checks if the user has exceeded their maximum concurrent tasks.
@@ -40,9 +36,9 @@ Before the download even begins, the `new_event` method in `mirror_leech.py` cal
 
 If any of these checks fail, the task is rejected. If they pass, the process continues to the queuing logic.
 
-#### 4. The Queuing Logic: Where the Magic Happens
+4. The Queuing Logic: Where the Magic Happens
 
-**File:** `bot/helper/ext_utils/task_manager.py`
+**File:** `echobotz/helper/ext_utils/task_manager.py`
 
 The core of the queueing system resides in the `check_running_tasks` function. This function is called after the `pre_task_check`. Here's how it works:
 
@@ -62,9 +58,9 @@ The bot maintains two separate queues:
 
 This separation allows the bot to manage download and upload resources independently. For a leech task, it will first go through the download queue (if necessary), and after the download is complete, it will go through the upload queue (if necessary).
 
-#### 6. Processing the Queue: The `start_from_queued` Function
+6. Processing the Queue: The `start_from_queued` Function
 
-**File:** `bot/helper/ext_utils/task_manager.py`
+**File:** `echobotz/helper/ext_utils/task_manager.py`
 
 The `start_from_queued` function is responsible for processing the queues. This function is called whenever a task completes. It checks the `queued_dl` and `queued_up` dictionaries and, if there are any waiting tasks and the limits allow, it will:
 
@@ -72,22 +68,10 @@ The `start_from_queued` function is responsible for processing the queues. This 
 2.  **Set the Event:** It calls the `.set()` method on the `asyncio.Event` object associated with the task.
 3.  **Start the Task:** This triggers the waiting task to resume its execution (either downloading or uploading).
 
-#### 7. Bypassing the Queue: The `force_start` Command
-
-**File:** `bot/modules/force_start.py`
-
-Users can bypass the queue for a specific task using the `/forcestart` command. This command is handled by the `remove_from_queue` function in `force_start.py`.
-
-Here's how it works:
-
-1.  **Identify the Task:** The user can either reply to the message that initiated the task or provide the task's GID (Group ID).
-2.  **Set Force Flags:** The function sets the `force_download` or `force_upload` flag on the task's listener object to `True`.
-3.  **Start the Task:** It then calls `start_dl_from_queued` or `start_up_from_queued` to immediately start the task, regardless of the queue limits.
-
-#### Summary of the Leech Example
+ Summary of the Leech Example
 
 1.  A user issues a `/leech` command.
-2.  The `leech` function in `mirror_leech.py` is called.
+2.  The `leech` function in `mmleech.py` is called.
 3.  `pre_task_check` in `task_manager.py` verifies the user and task limits.
 4.  `check_running_tasks` in `task_manager.py` checks the download queue limits.
 5.  If the download queue is full, the task is added to `queued_dl` and waits.
@@ -95,8 +79,6 @@ Here's how it works:
 7.  After the download is complete, `check_running_tasks` is called again for the upload phase.
 8.  If the upload queue is full, the task is added to `queued_up` and waits.
 9.  Once an upload slot is available, `start_from_queued` starts the upload.
-10. The user can use `/forcestart` at any point to bypass the download or upload queue.
 
----
-
-Please follow these instructions to implement the queue system in the "En" repository on the "dl" branch. Let me know if you have any questions.
+Please follow these instructions to implement the queue system in my bot. I've already created base queue system you just have to expend it. also if any dictionary of lock is missing in echobotz/__init__.py you can add only if anything is missing. 
+thanks you jules.
