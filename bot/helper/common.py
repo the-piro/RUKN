@@ -676,6 +676,7 @@ class TaskConfig:
     async def proceed_extract(self, dl_path, gid):
         pswd = self.extract if isinstance(self.extract, str) else ""
         self.files_to_proceed = []
+        t_path = None
         if self.is_file and is_archive(dl_path):
             self.files_to_proceed.append(dl_path)
         else:
@@ -723,8 +724,8 @@ class TaskConfig:
                             await remove(del_path)
                         except Exception:
                             self.is_cancelled = True
-        return t_path if self.is_file and code == 0 else dl_path
-
+        return t_path if self.is_file and code == 0 and t_path else dl_path
+        
     async def proceed_ffmpeg(self, dl_path, gid):
         checked = False
         cmds = [
