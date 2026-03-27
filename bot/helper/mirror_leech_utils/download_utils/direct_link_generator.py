@@ -1208,7 +1208,7 @@ def gofile(url):
             "Accept": "*/*",
             "Connection": "keep-alive",
             "Authorization": "Bearer" + " " + token,
-            "X-Website-Token": "4fd6sg89d7s6",
+            "X-Website-Token": "5d4f7g8sd45fsd",
         }
         if _password:
             _url += f"&password={_password}"
