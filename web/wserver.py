@@ -103,7 +103,7 @@ async def re_verify(paused, resumed, hash_id):
 
 @app.get("/app/files", response_class=HTMLResponse)
 async def files(request: Request):
-    return templates.TemplateResponse("page.html", {"request": request})
+    return templates.TemplateResponse(request, "page.html")
 
 
 @app.api_route(
